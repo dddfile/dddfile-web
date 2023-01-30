@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="assets/spectre.min.css">
+    <style>
+      .btn.btn-primary {
+        background-color: #BA3B0A;
+        border-color: #AA2B09;
+      }
+      .btn.btn-primary:hover {
+        background-color: #AA2B09;
+        border-color: #9A1B02;
+      }
+      header.navbar {
+        height: 100px;
+      }
+      .search.form-input {
+        width: 100%;
+      }
+      .column.asset {
+        padding: 5px;
+      }
+      .card-footer.tags {
+        overflow-wrap: break-word;
+      }
+    </style>
+    <script>
+      let searchInput;
+      window.onload = () => {
+        const searchButton = document.getElementById('searchButton');
+        searchInput = document.getElementById('searchText');
+        searchButton.addEventListener('click', search);
+        searchInput.addEventListener('keyup', (e) =>{
+          if (e.key.toLowerCase() == 'enter') search();
+        })
+      }
+      function search() {
+        const query = searchInput.value || '';
+        if (query) {
+          window.location.href = '/?q=' + query;
+        } else {
+          window.location.href = '/'
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        var lazyloadImages;    
+
+        if ("IntersectionObserver" in window) {
+          lazyloadImages = document.querySelectorAll(".lazy");
+          var imageObserver = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                var image = entry.target;
+                image.src = image.dataset.src;
+                image.classList.remove("lazy");
+                imageObserver.unobserve(image);
+              }
+            });
+          });
+
+          lazyloadImages.forEach(function(image) {
+            imageObserver.observe(image);
+          });
+        } else {  
+          var lazyloadThrottleTimeout;
+          lazyloadImages = document.querySelectorAll(".lazy");
+          
+          function lazyload () {
+            if(lazyloadThrottleTimeout) {
+              clearTimeout(lazyloadThrottleTimeout);
+            }    
+
+            lazyloadThrottleTimeout = setTimeout(function() {
+              var scrollTop = window.pageYOffset;
+              lazyloadImages.forEach(function(img) {
+                  if(img.offsetTop < (window.innerHeight + scrollTop)) {
+                    img.src = img.dataset.src;
+                    img.classList.remove('lazy');
+                  }
+              });
+              if(lazyloadImages.length == 0) { 
+                document.removeEventListener("scroll", lazyload);
+                window.removeEventListener("resize", lazyload);
+                window.removeEventListener("orientationChange", lazyload);
+              }
+            }, 20);
+          }
+
+          document.addEventListener("scroll", lazyload);
+          window.addEventListener("resize", lazyload);
+          window.addEventListener("orientationChange", lazyload);
+        }
+      })
+    </script>
+  </head>
+  <body>
+    <div class="main container">
+      <div class="columns">
+        <div class="column col-8 col-mx-auto">
+          <header class="navbar">
+            <section class="navbar-section">
+              <a href="/" class="btn btn-link"><img src="/assets/logo.png" style="width:120px" /></a>
+            </section>
+            <section class="navbar-section">
+              <input id="searchText" class="form-input search" type="text" placeholder="Search" value="{{.searchText}}" />
+              <button id="searchButton" class="btn btn-primary input-group-btn">Search</button>
+            </section>
+            <!-- <section class="navbar-section">
+              <a href="#" class="btn btn-link">Twitter</a>
+              <a href="#" class="btn btn-link">GitHub</a>
+            </section> -->
+          </header>
+          <div class="content">
+            <div class="container">
+              <div class="columns">
+                {{range .assets}}
+                <div class="column col-3 col-md-12 col-lg-6 col-xl-4 asset">
+                  <div class="card">
+                    <div class="card-image">
+                      <a href="{{.Url}}" target="_blank">
+                        <img data-src="{{.PreviewUrl}}" class="img-responsive lazy" />
+                      </a>
+                    </div>
+                    <div class="card-body">
+                      {{.Title}}
+                    </div>
+                    <div class="card-footer text-tiny tags">
+                      <span class="chip">tags</span>{{.Tags}}
+                    </div>
+                  </div>
+                </div>
+                {{end}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
