@@ -29,7 +29,10 @@ func main() {
 
 		
 		// connection string
-    psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, username, password, database)
+    psqlconn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", host, port, username, password, database)
+		if getEnvVar("GIN_MODE") != "release" {
+			psqlconn = psqlconn + " sslmode=disable"
+		}
 		
 		// open database
     db, err := sql.Open("postgres", psqlconn)
