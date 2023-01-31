@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="assets/spectre.min.css">
     <style>
       .btn.btn-primary {
@@ -97,12 +98,12 @@
   <body>
     <div class="main container">
       <div class="columns">
-        <div class="column col-8 col-mx-auto">
+        <div class="column col-10 col-mx-auto">
           <header class="navbar">
-            <section class="navbar-section">
+            <section class="navbar-section column col-xs-12">
               <a href="/" class="btn btn-link"><img src="/assets/logo.png" style="width:120px" /></a>
             </section>
-            <section class="navbar-section">
+            <section class="navbar-section column col-xs-12">
               <input id="searchText" class="form-input search" type="text" placeholder="Search" value="{{.searchText}}" />
               <button id="searchButton" class="btn btn-primary input-group-btn">Search</button>
             </section>
@@ -115,7 +116,7 @@
             <div class="container">
               <div class="columns">
                 {{range .assets}}
-                <div class="column col-3 col-md-12 col-lg-6 col-xl-4 asset">
+                <div class="column col-sm-12 col-lg-6 col-xl-4 col-3 asset">
                   <div class="card">
                     <div class="card-image">
                       <a href="{{.Url}}" target="_blank">
