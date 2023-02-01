@@ -21,13 +21,23 @@
 
     <link rel="stylesheet" href="assets/spectre.min.css">
     <style>
-      .btn.btn-primary {
-        background-color: #BA3B0A;
+      body {
+        min-width: 320px;
+      }
+      .btn.btn-primary, .page-item.active a {
+        background-color: #BA3B0A !important;
         border-color: #AA2B09;
+        color: #fff !important;
       }
       .btn.btn-primary:hover {
         background-color: #AA2B09;
         border-color: #9A1B02;
+      }
+      a, a:visited {
+        color: #BA3B0A !important;
+      }
+      a:hover {
+        color: #AA2B09 !important;
       }
       header.navbar {
         height: 100px;
@@ -38,22 +48,86 @@
       .search.form-input {
         width: 100%;
       }
+      #searchClose {
+        display: none;
+        margin: 0;
+        padding: 0;
+        margin-left: -30px;
+        background-color: transparent;
+        z-index: 10;
+        width: 32px;
+        height: 32px;
+      }
+      #searchClose img {
+        width: 22px;
+        height: 22px;
+      }
       .column.asset {
         padding: 5px;
       }
       .card-footer.tags {
         overflow-wrap: break-word;
       }
+      .pager.column {
+        display: flex;
+        justify-content: center;
+      }
+
     </style>
     <script>
       let searchInput;
       window.onload = () => {
         const searchButton = document.getElementById('searchButton');
         searchInput = document.getElementById('searchText');
+        const searchClose = document.getElementById('searchClose');
+        if (searchInput.value) {
+          console.log(searchClose.style.display)
+          searchClose.style.display = "inline-flex";
+          searchClose.addEventListener('click', () => {
+            searchInput.value = '';
+            searchButton.click();
+          });
+        }
         searchButton.addEventListener('click', search);
         searchInput.addEventListener('keyup', (e) =>{
           if (e.key.toLowerCase() == 'enter') search();
-        })
+        });
+
+        const pagingPrevious = document.getElementById('pagingPrevious');
+        const pagingNext = document.getElementById('pagingNext');
+
+        let page = 1, query = '';
+        if (window.location.search) {
+          let matches = window.location.search.match(/page=(\d*)/);
+          if (matches?.length > 1) {
+            page = parseInt(matches[1]);
+            if (page > 1) {
+              pagingPrevious.classList.remove('disabled');
+            }
+          }
+
+          matches = window.location.search.match(/q=([^&]*)/);
+          if (matches?.length > 1) {
+            query = matches[1];
+          }
+        }
+
+        if (page > 1) {
+          pagingPrevious.addEventListener('click', () => {
+            if (query) {
+              window.location.search = `?q=${query}&page=${page-1}`;
+            } else {
+              window.location.search = `?page=${page-1}`;
+            }
+          });
+        }
+        pagingNext.addEventListener('click', () => {
+            if (query) {
+              window.location.search = `?q=${query}&page=${page+1}`;
+            } else {
+              window.location.search = `?page=${page+1}`;
+            }
+          });
       }
       function search() {
         const query = searchInput.value || '';
@@ -120,19 +194,22 @@
       <div class="columns">
         <div class="column col-10 col-mx-auto">
           <div class="container">
-          <header class="navbar columns">
-            <section class="navbar-section column col-sm-12 col-md-3 col-3">
-              <a href="/"><img src="/assets/logo.png" style="width:120px" /></a>
-            </section>
-            <section class="navbar-section column col-sm-12 col-md-9 col-9">
-              <input id="searchText" class="form-input search" type="text" placeholder="Search" value="{{.searchText}}" />
-              <button id="searchButton" class="btn btn-primary input-group-btn">Search</button>
-            </section>
-            <!-- <section class="navbar-section">
-              <a href="#" class="btn btn-link">Twitter</a>
-              <a href="#" class="btn btn-link">GitHub</a>
-            </section> -->
-          </header>
+            <header class="navbar columns">
+              <section class="navbar-section column col-sm-12 col-md-3 col-3">
+                <a href="/"><img src="/assets/logo.png" style="width:120px" /></a>
+              </section>
+              <section class="navbar-section column col-sm-12 col-md-9 col-9">
+                <input id="searchText" class="form-input search" type="search" placeholder="Search" value="{{.searchText}}" />
+                <div id="searchClose" class="chip">
+                  <img src="assets/x.png" />
+                </div>
+                <button id="searchButton" class="btn btn-primary input-group-btn">Search</button>
+              </section>
+              <!-- <section class="navbar-section">
+                <a href="#" class="btn btn-link">Twitter</a>
+                <a href="#" class="btn btn-link">GitHub</a>
+              </section> -->
+            </header>
           </div>
 
           <div class="content">
@@ -155,6 +232,42 @@
                   </div>
                 </div>
                 {{end}}
+              </div>
+            </div>
+          </div>
+
+          <div class="container">
+            <div class="columns">
+              <div class="pager column col-12">
+                <ul class="pagination">
+                  <li class="page-item disabled">
+                    <button id="pagingPrevious" class="btn btn-primary">Previous</button>
+                  </li>
+                  <!-- {{range $page := .pages}}
+                  <li class="page-item">
+                    <a href="#">{{$page}}</a>
+                  </li>
+                  {{end}} -->
+                  <!-- 
+                  <li class="page-item active">
+                    <a href="#">1</a>
+                  </li>
+                  <li class="page-item">
+                    <a href="#">2</a>
+                  </li>
+                  <li class="page-item">
+                    <a href="#">3</a>
+                  </li>
+                  <li class="page-item">
+                    <span>...</span>
+                  </li>
+                  <li class="page-item">
+                    <a href="#">12</a>
+                  </li> -->
+                  <li class="page-item">
+                    <button id="pagingNext" class="btn btn-primary">Next</button>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>

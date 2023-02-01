@@ -8,6 +8,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/joho/godotenv"
 	"os"
+	"strings"
+	"strconv"
 )
 
 func main() {
@@ -42,18 +44,47 @@ func main() {
     defer db.Close()
 		
 		searchText := c.Query("q")
+		page := c.Query("page")
+
 		var sql string
+		sqlCount := ""
 		// sql := " "
 		if searchText == "" {
-			sql = `select title, url, preview_url, tags, asset_created_on from crawl_asset`
+			sql = `select title, url, preview_url, tags, asset_created_on from crawl_asset order by id desc LIMIT 30`
+			sqlCount = `select count(*) from crawl_asset`
 		} else {
-			sql = fmt.Sprintf(`SELECT title, url, preview_url, tags, asset_created_on FROM crawl_asset WHERE document_vectors @@ to_tsquery('%s')`, searchText)
+			ftsPhrase := "'" + strings.Replace(searchText, " ", " <-> ", 10) + "'"
+			sql = fmt.Sprintf(`SELECT title, url, preview_url, tags, asset_created_on FROM crawl_asset WHERE document_vectors @@ to_tsquery(%s) order by id desc  LIMIT 30`, ftsPhrase)
+			sqlCount = fmt.Sprintf(`SELECT COUNT(*) FROM crawl_asset WHERE document_vectors @@ to_tsquery(%s)`, ftsPhrase)
+		}
+
+		if page != "" {
+			pageInt, err := strconv.ParseInt(page, 10, 32)
+			if (pageInt > 0) {
+				pageInt = pageInt - 1
+			}
+
+			if err != nil {
+				panic(err)
+			}
+			sql = sql + " OFFSET " + strconv.FormatInt(pageInt * 30, 10)
 		}
 			
 		fmt.Println(sql);
 		rows, err := db.Query(sql)
 		CheckError(err)
 		defer rows.Close()
+
+		rowCount := 30
+		if sqlCount != "" {
+			row := db.QueryRow(sqlCount)
+			err = row.Scan(&rowCount)
+			CheckError(err)
+
+			if rowCount > 500 {
+				rowCount = 500
+			}
+		}
 		
 		type Asset struct {
 			Title, Url, PreviewUrl, Tags, CreatedOn string
@@ -79,12 +110,16 @@ func main() {
 		
 		CheckError(err)
 
-		// c.HTML(http.StatusOK, "index.tmpl", gin.H {
-    //   "title": "Main website",
-    // })
+		var pages []int
+		pageCount := int(rowCount / 30)
+		for i := 0; i < pageCount; i++ {
+			pages = append(pages, i+1)
+		}
+
 		c.HTML(http.StatusOK, "index.html", gin.H {
 			"searchText": searchText,
 			"assets": assets,
+			"pages": pages,
 		})
 		// c.HTML(http.StatusOK, "index.tmpl", assets)
   })
