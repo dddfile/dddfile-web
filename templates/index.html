@@ -231,22 +231,28 @@
           <div class="content">
             <div class="container">
               <div class="columns">
-                {{range .assets}}
+                {{range $i, $asset := .assets}}
                 <div class="column col-sm-12 col-lg-6 col-xl-4 col-3 asset">
                   <div class="card">
                     <div class="card-image">
-                      <a href="{{.Url}}" target="_blank">
-                        <img data-src="{{.PreviewUrl}}" class="img-responsive lazy" />
+                      <a href="{{$asset.Url}}" target="_blank">
+                        <img data-src="{{$asset.PreviewUrl}}" class="img-responsive lazy" />
                       </a>
                     </div>
                     <div class="card-body">
-                      {{.Title}}
+                      {{$asset.Title}}
                     </div>
                     <div class="card-footer text-tiny tags">
-                      <span class="chip">tags</span>{{.Tags}}
+                      <span class="chip">tags</span>{{$asset.Tags}}
                     </div>
                   </div>
                 </div>
+                {{if eq $i 5}}
+                <div class="column col-sm-12 col-lg-6 col-xl-4 col-3 asset">
+                  <div id="amzn-assoc-ad-a9300f30-5b11-4632-9869-2d00466f1252"></div>
+                  <script async src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US&adInstanceId=a9300f30-5b11-4632-9869-2d00466f1252"></script>
+                </div>
+                {{end}}
                 {{end}}
               </div>
             </div>

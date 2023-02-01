@@ -5,6 +5,7 @@ import (
   "github.com/gin-gonic/gin"
 	"database/sql"
 	"fmt"
+	"html/template"
 	_ "github.com/lib/pq"
 	"github.com/joho/godotenv"
 	"os"
@@ -26,6 +27,9 @@ func main() {
 
   router := gin.Default()
 	router.Static("/assets", "./assets")
+	router.SetFuncMap(template.FuncMap{
+		"mod": mod,
+	})
 	router.LoadHTMLGlob("templates/*")
   router.GET("/", func(c *gin.Context) {
 
@@ -125,6 +129,8 @@ func main() {
   })
   router.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
+
+func mod(i, j int) bool { return i%j == 0 }
 
 func CheckError(err error) {
 	if err != nil {
