@@ -110,16 +110,16 @@ func main() {
 		
 		CheckError(err)
 
-		var pages []int
-		pageCount := int(rowCount / 30)
-		for i := 0; i < pageCount; i++ {
-			pages = append(pages, i+1)
-		}
+		// var pages []int
+		// pageCount := int(rowCount / 30)
+		// for i := 0; i < pageCount; i++ {
+		// 	pages = append(pages, i+1)
+		// }
 
 		c.HTML(http.StatusOK, "index.html", gin.H {
 			"searchText": searchText,
 			"assets": assets,
-			"pages": pages,
+			"rowCount": rowCount,
 		})
 		// c.HTML(http.StatusOK, "index.tmpl", assets)
   })

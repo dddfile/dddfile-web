@@ -61,6 +61,7 @@
       #searchClose img {
         width: 22px;
         height: 22px;
+        cursor: pointer;
       }
       .column.asset {
         padding: 5px;
@@ -72,7 +73,11 @@
         display: flex;
         justify-content: center;
       }
-
+      #pagingPrevious, #pagingNext {
+        display: none;
+        width:100px;
+        margin: 0 10px;
+      }
     </style>
     <script>
       let searchInput;
@@ -96,38 +101,48 @@
         const pagingPrevious = document.getElementById('pagingPrevious');
         const pagingNext = document.getElementById('pagingNext');
 
-        let page = 1, query = '';
-        if (window.location.search) {
-          let matches = window.location.search.match(/page=(\d*)/);
-          if (matches?.length > 1) {
-            page = parseInt(matches[1]);
-            if (page > 1) {
-              pagingPrevious.classList.remove('disabled');
+        const rowCount = {{.rowCount}};
+        if (rowCount > 30) {
+          pagingPrevious.style.display = 'block';
+          pagingNext.style.display = 'block';
+        
+          let page = 1, query = '';
+          if (window.location.search) {
+            let matches = window.location.search.match(/page=(\d*)/);
+            if (matches?.length > 1) {
+              page = parseInt(matches[1]);
+              if (page > 1) {
+                pagingPrevious.classList.remove('disabled');
+              }
+            }
+
+            matches = window.location.search.match(/q=([^&]*)/);
+            if (matches?.length > 1) {
+              query = matches[1];
             }
           }
 
-          matches = window.location.search.match(/q=([^&]*)/);
-          if (matches?.length > 1) {
-            query = matches[1];
+          if (page > 1) {
+            pagingPrevious.addEventListener('click', () => {
+              if (query) {
+                window.location.search = `?q=${query}&page=${page-1}`;
+              } else {
+                window.location.search = `?page=${page-1}`;
+              }
+            });
+          }
+          if (rowCount >= page * 30) {
+            pagingNext.addEventListener('click', () => {
+              if (query) {
+                window.location.search = `?q=${query}&page=${page+1}`;
+              } else {
+                window.location.search = `?page=${page+1}`;
+              }
+            });
+          } else {
+            pagingNext.classList.add('disabled');
           }
         }
-
-        if (page > 1) {
-          pagingPrevious.addEventListener('click', () => {
-            if (query) {
-              window.location.search = `?q=${query}&page=${page-1}`;
-            } else {
-              window.location.search = `?page=${page-1}`;
-            }
-          });
-        }
-        pagingNext.addEventListener('click', () => {
-            if (query) {
-              window.location.search = `?q=${query}&page=${page+1}`;
-            } else {
-              window.location.search = `?page=${page+1}`;
-            }
-          });
       }
       function search() {
         const query = searchInput.value || '';
@@ -240,30 +255,9 @@
             <div class="columns">
               <div class="pager column col-12">
                 <ul class="pagination">
-                  <li class="page-item disabled">
-                    <button id="pagingPrevious" class="btn btn-primary">Previous</button>
-                  </li>
-                  <!-- {{range $page := .pages}}
                   <li class="page-item">
-                    <a href="#">{{$page}}</a>
+                    <button id="pagingPrevious" class="btn btn-primary disabled">Previous</button>
                   </li>
-                  {{end}} -->
-                  <!-- 
-                  <li class="page-item active">
-                    <a href="#">1</a>
-                  </li>
-                  <li class="page-item">
-                    <a href="#">2</a>
-                  </li>
-                  <li class="page-item">
-                    <a href="#">3</a>
-                  </li>
-                  <li class="page-item">
-                    <span>...</span>
-                  </li>
-                  <li class="page-item">
-                    <a href="#">12</a>
-                  </li> -->
                   <li class="page-item">
                     <button id="pagingNext" class="btn btn-primary">Next</button>
                   </li>
