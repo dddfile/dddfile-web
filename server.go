@@ -37,7 +37,11 @@ func main() {
 	defer db.Close()
 
   router := gin.Default()
+	
+	router.StaticFile("/sitemap.xml", "./static/sitemap.xml")
+	router.StaticFile("/robots.txt", "./static/robots.txt")
 	router.Static("/assets", "./assets")
+
 	router.SetFuncMap(template.FuncMap{
 		"mod": mod,
 	})
