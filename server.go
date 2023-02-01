@@ -38,8 +38,16 @@ func main() {
 
   router := gin.Default()
 	
-	router.StaticFile("/sitemap.xml", "./static/sitemap.xml")
+	router.StaticFile("/android-chrome-192x192.png", "./static/android-chrome-192x192.png")
+	router.StaticFile("/android-chrome-512x512.png", "./static/android-chrome-512x512.png")
+	router.StaticFile("/apple-touch-icon.png", "./static/apple-touch-icon.png")
+	router.StaticFile("/favicon.ico", "./static/favicon.ico")
+	router.StaticFile("/favicon-16x16.png", "./static/favicon-16x16.png")
+	router.StaticFile("/favicon-32x32.png", "./static/favicon-32x32.png")
 	router.StaticFile("/robots.txt", "./static/robots.txt")
+	router.StaticFile("/site.webmanifest", "./static/site.webmanifest")
+	router.StaticFile("/sitemap.xml", "./static/sitemap.xml")
+	
 	router.Static("/assets", "./assets")
 
 	router.SetFuncMap(template.FuncMap{
