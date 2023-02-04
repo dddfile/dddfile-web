@@ -125,7 +125,7 @@
 
             matches = window.location.search.match(/q=([^&]*)/);
             if (matches?.length > 1) {
-              query = matches[1];
+              query = matches[1].trim();
             }
           }
 
@@ -152,8 +152,10 @@
         }
       }
       function search() {
-        const query = searchInput.value || '';
+        let query = searchInput.value || '';
+        query = query.trim();
         if (query) {
+          query = query.replaceAll('  ', ' ');
           window.location.href = '/?q=' + query;
         } else {
           window.location.href = '/'
