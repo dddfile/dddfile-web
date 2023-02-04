@@ -155,8 +155,11 @@
         let query = searchInput.value || '';
         query = query.trim();
         if (query) {
-          query = query.replaceAll('  ', ' ');
-          window.location.href = '/?q=' + query;
+          query = query.replaceAll(/[^a-zA-Z0-9-_.\s]/ig, '');
+          while (query.includes('  ')) {
+            query = query.replaceAll('  ', ' ');
+          }
+          window.location.href = '/?q=' + encodeURIComponent(query);
         } else {
           window.location.href = '/'
         }

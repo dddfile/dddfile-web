@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -19,6 +20,7 @@ func main() {
 	util.CheckError(err)
 	dataservice.Init()
 	db := dataservice.GetDb()
+	regex := regexp.MustCompile(`[^a-zA-Z0-9-_.\s]`)
 
 	router := gin.Default()
 
@@ -50,7 +52,7 @@ func main() {
 			sql = `select id, title, url, preview_url, tags, asset_created_on from crawl_asset order by id desc LIMIT 30`
 			sqlCount = `select count(*) from crawl_asset`
 		} else {
-			ftsPhrase := strings.Replace(searchText, "  ", " ", -1)
+			ftsPhrase := strings.ReplaceAll(regex.ReplaceAllString(searchText, ""), "  ", " ") // strings.NewReplacer("&", "", "|", "", "  ", " ").Replace(searchText)
 			for strings.Contains(ftsPhrase, "  ") {
 				ftsPhrase = strings.Replace(ftsPhrase, "  ", " ", -1)
 			}
@@ -69,7 +71,8 @@ func main() {
 				whereClause = strings.TrimSuffix(whereClause, "|") + `')`
 				orderClause = strings.TrimSuffix(orderClause, "|") + `') desc`
 			}
-			sql = fmt.Sprintf(`SELECT id, title, url, preview_url, tags, asset_created_on FROM crawl_asset WHERE %s ORDER BY %s LIMIT 30`, whereClause, orderClause)
+			orderAndClause := strings.Replace(orderClause, "|", "&", -1)
+			sql = fmt.Sprintf(`SELECT id, title, url, preview_url, tags, asset_created_on FROM crawl_asset WHERE %s ORDER BY %s, %s LIMIT 30`, whereClause, orderAndClause, orderClause)
 			sqlCount = fmt.Sprintf(`SELECT COUNT(*) FROM crawl_asset WHERE %s`, whereClause)
 		}
 
