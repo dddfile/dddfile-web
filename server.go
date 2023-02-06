@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -23,6 +24,10 @@ func main() {
 	regex := regexp.MustCompile(`[^a-zA-Z0-9-_.\s]`)
 
 	router := gin.Default()
+
+	if os.Getenv("GIN_MODE") == "local" {
+		router.Static("/storage", "../dddfile-crawler/storage")
+	}
 
 	router.StaticFile("/android-chrome-192x192.png", "./static/android-chrome-192x192.png")
 	router.StaticFile("/android-chrome-512x512.png", "./static/android-chrome-512x512.png")
