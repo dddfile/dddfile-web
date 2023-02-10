@@ -31,6 +31,9 @@
       body {
         min-width: 320px;
       }
+      h1 {
+        font-size:1.2rem;
+      }
       .btn.btn-primary, .page-item.active a {
         background-color: #BA3B0A !important;
         border-color: #AA2B09;
@@ -241,6 +244,11 @@
 
           <div class="content">
             <div class="container">
+              
+              {{if .searchText}}
+              <h1>{{.rowCount}} search results for "{{.searchText}}"</h1>
+              {{end}}
+
               <div class="columns">
                 {{range $i, $asset := .assets}}
                 <div class="column col-sm-12 col-lg-6 col-xl-4 col-3 asset">

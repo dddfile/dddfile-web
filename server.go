@@ -104,9 +104,9 @@ func main() {
 			err = row.Scan(&rowCount)
 			util.CheckError(err)
 
-			if rowCount > 500 {
-				rowCount = 500
-			}
+			// if rowCount > 500 {
+			// 	rowCount = 500
+			// }
 		}
 
 		type Asset struct {
