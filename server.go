@@ -54,7 +54,7 @@ func main() {
 		sqlCount := ""
 		// sql := " "
 		if searchText == "" {
-			sql = `select id, title, url, preview_url, tags, asset_created_on from crawl_asset order by id desc LIMIT 30`
+			sql = `select id, title, url, preview_url, tags, asset_created_on, free from crawl_asset order by id desc LIMIT 30`
 			sqlCount = `select count(*) from crawl_asset`
 		} else {
 			ftsPhrase := strings.ReplaceAll(regex.ReplaceAllString(searchText, ""), "  ", " ") // strings.NewReplacer("&", "", "|", "", "  ", " ").Replace(searchText)
@@ -77,7 +77,7 @@ func main() {
 				orderClause = strings.TrimSuffix(orderClause, "|") + `') desc`
 			}
 			orderAndClause := strings.Replace(orderClause, "|", "&", -1)
-			sql = fmt.Sprintf(`SELECT id, title, url, preview_url, tags, asset_created_on FROM crawl_asset WHERE %s ORDER BY %s, %s LIMIT 30`, whereClause, orderAndClause, orderClause)
+			sql = fmt.Sprintf(`SELECT id, title, url, preview_url, tags, asset_created_on, free FROM crawl_asset WHERE %s ORDER BY %s, %s LIMIT 30`, whereClause, orderAndClause, orderClause)
 			sqlCount = fmt.Sprintf(`SELECT COUNT(*) FROM crawl_asset WHERE %s`, whereClause)
 		}
 
@@ -112,13 +112,15 @@ func main() {
 		type Asset struct {
 			Id                                      int
 			Title, Url, PreviewUrl, Tags, CreatedOn string
+			Free                                    bool
 		}
 		var assets []Asset
 		for rows.Next() {
 			var title, url, preview_url, tags, asset_created_on string
 			var id int
+			var free *bool
 
-			err = rows.Scan(&id, &title, &url, &preview_url, &tags, &asset_created_on)
+			err = rows.Scan(&id, &title, &url, &preview_url, &tags, &asset_created_on, &free)
 			util.CheckError(err)
 
 			// fmt.Println(title, url)
@@ -130,6 +132,10 @@ func main() {
 				PreviewUrl: preview_url,
 				Tags:       tags,
 				CreatedOn:  asset_created_on,
+				Free:       false,
+			}
+			if free != nil {
+				asset.Free = *free
 			}
 			assets = append(assets, asset)
 		}
